@@ -130,6 +130,7 @@ public class BaseFragment extends Fragment {
     "郑州","张家口","镇江","漳州","枣庄","中山","珠海","长治","肇庆","湛江","自贡","资阳","攀枝花","张家界","泸州","淄博",
     "达州","德阳","德州","滨州","白城","白山","巴彦淖尔","巴音郭楞州","博尔塔拉州","白银","宝鸡","保山","重庆"};
 
+    private int position = -1;
     private void showDialog(){
         if(cityDialog == null){
             cityDialog = new AlertDialog.Builder(getContext());
@@ -139,14 +140,13 @@ public class BaseFragment extends Fragment {
         cityDialog.setSingleChoiceItems(mCitys, 0, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                ((BaseActivity)getActivity()).addCityWeather(mCitys[i]);
-
+                position = i;
             }
         });
         cityDialog.setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
+                ((BaseActivity)getActivity()).addCityWeather(mCitys[position]);
             }
         });
         cityDialog.show();
