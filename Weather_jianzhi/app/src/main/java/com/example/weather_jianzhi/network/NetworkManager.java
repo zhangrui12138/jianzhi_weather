@@ -52,7 +52,11 @@ public class NetworkManager {
                  mLoggerUtil.debug(call.request().toString());
                 if(response.isSuccessful() && response.body() != null){
                     mLoggerUtil.debug(response.body().toString());
-                    callback.onRequestComplete(response.body());
+                    if(response.body().getCode() == 200 && !"weather_err".equals(response.body().getMsg())) {
+                        callback.onRequestComplete(response.body());
+                    }else {
+                        mLoggerUtil.debug("json 解析失败！！！");
+                    }
                 }
              }
 

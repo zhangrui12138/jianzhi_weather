@@ -20,6 +20,7 @@ import com.example.weather_jianzhi.bean.ForcastBean;
 import com.example.weather_jianzhi.bean.GsonBean;
 import com.example.weather_jianzhi.bean.HforcastBean;
 import com.example.weather_jianzhi.bean.ResultBean;
+import com.example.weather_jianzhi.util.LoggerUtil;
 
 import java.util.List;
 
@@ -27,8 +28,11 @@ public class BaseFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if(loggerUtil == null){
+            loggerUtil = new LoggerUtil();
+        }
         View view = inflater.inflate(R.layout.tianqi_item,container,false);
-        if(gsonBean != null){
+        if(gsonBean != null && gsonBean.getResult() != null){
             TextView textView = (TextView) view.findViewById(R.id.city);
             TextView current_temperature = (TextView) view.findViewById(R.id.current_temperature);
             TextView temp_msg = (TextView) view.findViewById(R.id.temp_msg);
@@ -104,7 +108,14 @@ public class BaseFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        loggerUtil.debug("onDestroyView==============");
+        mCityMessager = "";
+    }
 
+    private LoggerUtil loggerUtil;
     private String mCityMessager = "";
     private GsonBean gsonBean;
     private int mWidth = 0;
@@ -128,7 +139,7 @@ public class BaseFragment extends Fragment {
     "西安","西宁","徐州","邢台","孝感","忻州","兴安盟","新余","许昌","锡林郭勒盟","仙桃","兴化","襄阳",
     "烟台","延边朝鲜族","宜昌","银川","运城","岳阳","益阳","扬州","鹰潭","宜宾","玉林","伊犁哈萨克","玉溪","雅安",
     "郑州","张家口","镇江","漳州","枣庄","中山","珠海","长治","肇庆","湛江","自贡","资阳","攀枝花","张家界","泸州","淄博",
-    "达州","德阳","德州","滨州","白城","白山","巴彦淖尔","巴音郭楞州","博尔塔拉州","白银","宝鸡","保山","重庆"};
+    "达州","德阳","德州","滨州","白城","白山","巴彦淖尔","巴音郭楞州","博尔塔拉州","白银","宝鸡","保山","重庆","信阳"};
 
     private int position = -1;
     private void showDialog(){
@@ -146,7 +157,7 @@ public class BaseFragment extends Fragment {
         cityDialog.setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                ((BaseActivity)getActivity()).addCityWeather(mCitys[position]);
+                if(position != -1) ((BaseActivity)getActivity()).addCityWeather(mCitys[position]);
             }
         });
         cityDialog.show();
