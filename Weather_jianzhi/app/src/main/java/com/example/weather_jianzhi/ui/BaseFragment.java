@@ -69,6 +69,8 @@ public class BaseFragment extends Fragment {
                     weather_bg_resid = R.drawable.duoyun1;
                 }else if(mResultBean.getDay_condition().contains("雾")){
                     weather_bg_resid = R.drawable.wuqi;
+                }else if(mResultBean.getDay_condition().contains("阴")){
+                    weather_bg_resid = R.drawable.yin1;
                 }
             }
             if(weather_bg_resid != -1) weather_bg.setBackgroundResource(weather_bg_resid);

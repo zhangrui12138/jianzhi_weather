@@ -23,6 +23,8 @@ import com.example.weather_jianzhi.util.LoggerUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BaseActivity extends FragmentActivity implements NetworkManager.getCallBacker {
     private ViewPager viewpager;
@@ -30,7 +32,6 @@ public class BaseActivity extends FragmentActivity implements NetworkManager.get
     private NetworkManager mNetworkManager;
     private LoggerUtil mLoggerUtil;
     private String currentCity = "深圳";
-    private HandlerThread myThread;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,30 +41,24 @@ public class BaseActivity extends FragmentActivity implements NetworkManager.get
         setContentView(R.layout.activity_main2);
         viewpager = (ViewPager) findViewById(R.id.viewpager);
         mNetworkManager = new NetworkManager(Const.BaseUrl,this);
-        /*mNetworkManager.toNetwork(currentCity);*/
-        myThread = new HandlerThread("MyThreadHandler");
-        myThread.start();
         if(mLoggerUtil == null){
             mLoggerUtil = new LoggerUtil();
         }
-        handler = new Handler(myThread.getLooper()){
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what){
-                    case network_request:
-                        String currentCity = (String)msg.obj;
+        toDoRequest(currentCity);
+    }
+    private ExecutorService fixedThreadPool= Executors.newFixedThreadPool(20);
+    private void toDoRequest(String currentCity){
+        if(fixedThreadPool != null){
+            fixedThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if(mNetworkManager != null){
                         mLoggerUtil.debug("network_request currentCity="+currentCity);
-                        if(mNetworkManager != null){
-                            mNetworkManager.toNetwork(currentCity);
-                        }
-                        break;
+                        mNetworkManager.toNetwork(currentCity);
+                    }
                 }
-            }
-        };
-        Message message = handler.obtainMessage();
-        message.obj = currentCity;
-        handler.sendMessage(message);
+            });
+        }
     }
     private int mWidth = 0;
     private int mHeight = 0;
@@ -112,14 +107,8 @@ public class BaseActivity extends FragmentActivity implements NetworkManager.get
     }
 
     public void addCityWeather(String currentCity){
-        /*if(mNetworkManager != null){
-               mNetworkManager.toNetwork(currentCity);
-        }*/
-        Message message = handler.obtainMessage();
-        message.obj = currentCity;
-        handler.sendMessage(message);
+        toDoRequest(currentCity);
     }
 
     private final static int network_request = 0;
-    private Handler handler;
 }
